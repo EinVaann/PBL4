@@ -1,6 +1,7 @@
 package model;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Board {
     Map<Character,Integer> pieceTypeSymbol = new HashMap<>() {
@@ -13,9 +14,19 @@ public class Board {
             put('q',Piece.Queen);
         }
     };
+    Map<Integer,Character> pieceTypeSymbolB = new HashMap<>(){
+        {
+            put(Piece.King,'k');
+            put(Piece.Pawn,'p');
+            put(Piece.Knight,'n');
+            put(Piece.Bishop,'b');
+            put(Piece.Rook,'r');
+            put(Piece.Queen,'q');
+        }
+    };
     public GenerateMove generateMove;
-    public static int TurnColor;
-    public static int[] Square;
+    public int TurnColor;
+    public int[] Square;
     public Board(){
         Square = new int[64];
         generateMove = null;
@@ -46,7 +57,7 @@ public class Board {
         //set turn from fenCode
         String turn = fen.split(" ")[1];
         TurnColor = (turn.equals("w"))?8:16;
-        generateMove = new GenerateMove(Square);
+        generateMove = new GenerateMove(Square,TurnColor);
     }
 
     public void ShowBoard(){
@@ -60,7 +71,41 @@ public class Board {
     public void MovePiece(int startSquare,int targetSquare){
         Square[targetSquare] = Square[startSquare];
         Square[startSquare] = 0;
-        generateMove = new GenerateMove(Square);
+        TurnColor = TurnColor==16?8:16;
+        generateMove = new GenerateMove(Square,TurnColor);
+    }
+
+    public String getFenCode(){
+        String fenCode = "";
+        int emptyCount = 0;
+        int endrow = 0;
+        for(int piece: this.Square){
+            if (endrow==8){
+                if(emptyCount!=0){
+                    fenCode = fenCode+emptyCount;
+                }
+                fenCode=fenCode+"/";
+                endrow = 0;
+                emptyCount = 0;
+            }
+            int color = piece/8*8;
+            int type = piece%8;
+            if(type!=0) {
+                if(emptyCount!=0){
+                    fenCode = fenCode+emptyCount;
+                }
+                emptyCount = 0;
+                char chessSymbol = pieceTypeSymbolB.get(type);
+                if (color == Piece.Black) chessSymbol = Character.toUpperCase(chessSymbol);
+                fenCode = fenCode + chessSymbol;
+            }
+            else emptyCount++;
+            endrow++;
+        }
+
+        String turn = TurnColor==Piece.Black?"b":"w";
+        fenCode = fenCode+" "+turn;
+        return fenCode;
     }
 }
 

@@ -10,10 +10,11 @@ import java.util.Scanner;
 public class main {
     public static void main(String[] args) throws IOException {
         Board board = new Board();
-        String fenCode = "rnbqkbnr/k7/8/8/8/8/8/RNBQKBNR b KQkq - 0 1";
+        String fenCode = "rnbqkbnr/p7/1P6/8/8/8/8/RNBQKBNR b KQkq - 0 1";
         Calculate c = new Calculate();
         board.CreateBoard(fenCode);
         board.ShowBoard();
+        System.out.println(board.getFenCode());
         Scanner input = new Scanner(System.in);
        /* System.out.print("Start Square: ");
         int startSquare = input.nextInt();*/
@@ -21,13 +22,17 @@ public class main {
             System.out.print("\nStart Square: ");
             int start = input.nextInt();
             if(start<0 || start>63) break;
+            for (Move move : board.generateMove.moves) {
+                if(start==move.StartSquare)
+                    System.out.println(move.StartSquare + "->" + move.TargetSquare);
+            }
             System.out.print("Target Square: ");
             int target = input.nextInt();
             if(start<0 || start>63) break;
             if(board.generateMove.validMove(start,target)){
                 board.MovePiece(start,target);
-
                 board.ShowBoard();
+
             }else System.out.println("invalid move");
         }
         /*if (startSquare >= 0 && startSquare < 64) {

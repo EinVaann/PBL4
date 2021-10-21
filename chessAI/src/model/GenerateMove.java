@@ -7,9 +7,11 @@ public class GenerateMove {
     public List<Move> moves;
     //Get number of possible moves from every Square
     private int[] board = new int[64];
-    public GenerateMove(int[] board){
+    private int turnColor;
+    public GenerateMove(int[] board, int turnColor){
         //System.out.println("creating");
         this.board = board;
+        this.turnColor = turnColor;
         moves = GenerateMove();
     }
 
@@ -18,7 +20,7 @@ public class GenerateMove {
         for(int startSquare = 0; startSquare < 64 ; startSquare++){
 
             int piece = board[startSquare];
-            if(Piece.isColor(piece,Board.TurnColor)){
+            if(Piece.isColor(piece,turnColor)){
                 if(Piece.isSlidingPiece(piece)){
                     GenerateSlidingMove(startSquare,piece);
                 }
@@ -37,9 +39,43 @@ public class GenerateMove {
     }
 
     private void GeneratePawnMove(int startSquare, int piece) {
+        int CurrentColor = Piece.getColor(piece);
+        int OpponentColor = CurrentColor==8?16:8;
 
-
-
+        int pawnOffset = CurrentColor == Piece.Black?8:-8;
+        //pawn move
+        int targetSquare = startSquare + pawnOffset;
+        int pieceOnTargetSquare = board[targetSquare];
+        if(pieceOnTargetSquare==0){//There are a piece on target square
+            moves.add(new Move(startSquare,targetSquare));
+        }
+        //pawn double move at the start
+        int pawnStartRank = CurrentColor == Piece.Black?1:6;
+        if(startSquare/8==pawnStartRank){
+            //check if square is free
+            int doubleMoveSquare = startSquare + 2*pawnOffset;
+            int pieceOnSquare = board[doubleMoveSquare];
+            if(pieceOnTargetSquare==0){//There aren't any pieces on target square
+                moves.add(new Move(startSquare,doubleMoveSquare));
+            }
+        }
+        //pawn capture
+        int[] pawnCaptureOffset;
+        if(CurrentColor == Piece.Black){
+            pawnCaptureOffset = new int[]{7,9};
+        }else pawnCaptureOffset = new int[]{-7,-9};
+        for(int offsetIndex: pawnCaptureOffset){
+            int captureSquare = startSquare + offsetIndex;
+            //check if it is a diagonal move
+            int dx = Math.abs(captureSquare%8 - startSquare%8);
+            int dy = Math.abs(captureSquare/8 - startSquare/8);
+            if(dx!=1 || dy!=1) continue;
+            //check if there is a opponent pieces on capture square
+            int pieceOnCaptureSquare = board[captureSquare];
+            if ( Piece.isColor(pieceOnCaptureSquare,OpponentColor)){
+                moves.add(new Move(startSquare,captureSquare));
+            }
+        }
     }
 
     private void GenerateKingMove(int startSquare, int piece) {

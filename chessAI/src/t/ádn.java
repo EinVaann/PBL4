@@ -1,33 +1,99 @@
 package t;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.net.URL;
+import java.awt.geom.*;
+import java.awt.image.*;
+import java.io.*;
+import java.net.*;
+import javax.imageio.*;
+import javax.swing.*;
+import javax.swing.event.*;
 
-public class ádn {
+class TransparentImage extends JPanel
+{
+    private BufferedImage backImage, frontImage;
+    private float alpha = 1;
 
-    private Image loadImage(String imgFileName) throws Exception {
-        ClassLoader classLoader = getClass().getClassLoader();
-        URL resURL = classLoader.getResource(imgFileName);
-        if (resURL == null) {
-            return null;
-        } else {
-            File imgFile = new File(resURL.toURI());
-            return ImageIO.read(imgFile);
+    public TransparentImage()
+    {
+        try
+        {
+//          backImage = ImageIO.read(new File("mong.jpg") );
+            backImage = ImageIO.read(new File("resource\\12.png") );
+            frontImage = ImageIO.read(new File("resource\\22.png") );
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
         }
     }
 
-    private void drawImage(Graphics2D g2, Image img) {
-        g2.drawImage(img, 1, 1, 100, 100, null);
+    @Override
+    public Dimension getPreferredSize()
+    {
+        return new Dimension(backImage.getWidth(), backImage.getHeight());
     }
 
-    public void main(String[] args) throws Exception {
-        Image img = loadImage("Bishop-white.png");
-        JFrame frame = new JFrame("Chess");
-        frame.setSize(600, 600);
-        frame.setResizable(false);
-        Graphics2D g;
+    public void setAlpha(float alpha)
+    {
+        this.alpha = alpha;
+        repaint();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g)
+    {
+        super.paintComponent(g);
+
+        //  Paint background image
+
+        Graphics2D g2 = (Graphics2D) g;
+        int x = (getWidth() - backImage.getWidth())/2;
+        int y = (getHeight()- backImage.getHeight())/2;
+        g2.drawRenderedImage(backImage, AffineTransform.getTranslateInstance(x, y));
+
+        //  Paint foreground image with appropriate alpha value
+
+        Composite old = g2.getComposite();
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
+        x = (getWidth() - frontImage.getWidth())/2;
+        y = (getHeight()- frontImage.getHeight())/2;
+        g2.drawRenderedImage(frontImage, AffineTransform.getTranslateInstance(x, y));
+        g2.setComposite(old);
+    }
+
+    private static void createAndShowUI()
+    {
+        final TransparentImage app = new TransparentImage();
+
+        JSlider slider = new JSlider();
+        slider.addChangeListener(new ChangeListener()
+        {
+            public void stateChanged(ChangeEvent e)
+            {
+                JSlider source = (JSlider) e.getSource();
+                app.setAlpha(source.getValue()/100f);
+            }
+        });
+        slider.setValue(100);
+
+        JFrame frame = new JFrame("Transparent Image");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add( app );
+        frame.add(slider, BorderLayout.SOUTH);
+        frame.setLocationByPlatform( true );
+        frame.pack();
+        frame.setVisible( true );
+    }
+
+    public static void main(String[] args)
+    {
+        EventQueue.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                createAndShowUI();
+            }
+        });
     }
 }

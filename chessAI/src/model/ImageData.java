@@ -35,7 +35,7 @@ public final class ImageData {
                 Image img = loadImage("resource\\"+imageName + ".png");
                 keyNameValueImage.put(imageName, img);
             }
-            out.println(keyNameValueImage.size());
+            //out.println(keyNameValueImage.size());
         } catch (Exception e) {
             e.printStackTrace();
         }

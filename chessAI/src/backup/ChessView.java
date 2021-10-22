@@ -2,20 +2,20 @@ package backup;
 
 import model.Board;
 import model.ImageData;
+import model.Move;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
@@ -33,6 +33,7 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
 
     Color brown = new Color(212, 101, 4);
     Color littleWhite = new Color(245, 220, 198);
+    Color highlight = new Color(252, 153, 111, 127);
 
     private double scaleFactor = 0.9;
     private int originX = -1;
@@ -44,11 +45,13 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
     private ChessPiece movingPiece;
     private Point movingPiecePoint;
 
+    private String turn;
+    private List<Move> possibleMove = new ArrayList<Move>();
     public ChessView() {}
 
     public ChessView(Board board) {
         this.board = board;
-
+        turn = board.TurnColor==16?"Black":"White";
         this.keyNameValueImage = ImageData.getInstance().keyNameValueImage;
 
         addMouseListener(this);
@@ -63,18 +66,23 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
         cellSize = (int) (((double)smaller) * scaleFactor / 8);
         originX = (getSize().width - 8 * cellSize) / 2;
         originY = (getSize().height - 8 * cellSize) / 2;
-        //out.println(originX+"-"+originY);
 
+        g.drawString(turn,10,10);
         Graphics2D g2 = (Graphics2D)g;
         drawBoard(g2);
-        try {
-            drawPieces(g2);
-        } catch (IOException e) {
-            e.printStackTrace();
+        drawPieces(g2);
+
+        if(possibleMove.size()!=0){
+            for(Move move: possibleMove){
+                int targetRow = move.TargetSquare/8;
+                int targetCol = move.TargetSquare%8;
+                out.println(targetRow+"-"+targetCol);
+                drawPossibleMove(g2,targetCol,targetRow);
+            }
         }
     }
 
-    private void drawPieces(Graphics2D g2) throws IOException {
+    private void drawPieces(Graphics2D g2) {
         /*for(int row = 0; row < 8; row++) {
             for(int col = 0; col < 8; col++) {
                 ChessPiece piece = chessDelegate.pieceAt(col, row);
@@ -118,11 +126,26 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
         g2.fillRect(originX + row * cellSize, originY + column * cellSize, cellSize, cellSize);
     }
 
+    private void drawPossibleMove(Graphics2D g2,int row, int column){
+        g2.setColor(highlight);
+        g2.fillRect(originX + row * cellSize, originY + column * cellSize, cellSize, cellSize);
+
+    }
+
+    private void showPossibleMove(int row, int column){
+        int start = row*8+column;
+        possibleMove = new ArrayList<Move>();
+        for(Move move: board.generateMove.moves){
+            if(move.StartSquare==start){
+                possibleMove.add(move);
+            }
+        }
+    }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        movingPiecePoint = e.getPoint();
-        repaint();
+        //movingPiecePoint = e.getPoint();
+        //repaint();
     }
 
     @Override
@@ -136,8 +159,9 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
     public void mousePressed(MouseEvent e) {
         fromCol = (e.getPoint().x - originX) / cellSize;
         fromRow = (e.getPoint().y - originY) / cellSize;
+        showPossibleMove(fromRow,fromCol);
+        repaint();
        // movingPiece = chessDelegate.pieceAt(fromCol, fromRow);
-
     }
 
     @Override
@@ -152,9 +176,11 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
             //chessDelegate.movePiece(fromCol, fromRow, col, row);
             if(board.generateMove.validMove(start,target)) {
                 board.MovePiece(fromRow * 8 + fromCol, row * 8 + col);
-                repaint();
+                turn = board.TurnColor==16?"Black":"White";
             }
         }
+        possibleMove = new ArrayList<Move>();
+        repaint();
     }
 
     @Override

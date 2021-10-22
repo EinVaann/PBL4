@@ -1,23 +1,26 @@
 package backup;
 
+import model.Board;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.PrintWriter;
 import javax.swing.JFrame;
 
-public class ChessController implements ChessDelegate, ActionListener {
+public class ChessController implements ActionListener {
 
-    private ChessModel chessModel = new ChessModel();
+    //private ChessModel chessModel = new ChessModel();
+    private Board board;
     private ChessView panel;
     private PrintWriter printWriter;
 
-    ChessController() {
-        chessModel.reset();
-
+    public ChessController(Board board) {
+        //chessModel.reset();
+        this.board = board;
         JFrame frame = new JFrame("Chess");
         frame.setSize(600, 600);
         frame.setResizable(false);
-        panel = new ChessView(this);
+        panel = new ChessView(board);
 
         frame.add(panel);
 
@@ -25,9 +28,9 @@ public class ChessController implements ChessDelegate, ActionListener {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public static void main(String[] args) {
+   /* public static void main(String[] args) {
         new ChessController();
-    }
+    }*/
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -35,7 +38,7 @@ public class ChessController implements ChessDelegate, ActionListener {
 
     }
 
-    @Override
+   /* @Override
     public ChessPiece pieceAt(int col, int row) {
         return chessModel.pieceAt(col, row);
     }
@@ -47,5 +50,5 @@ public class ChessController implements ChessDelegate, ActionListener {
         if(printWriter != null) {
             printWriter.println(fromCol + "," + fromRow + "," + toCol + "," + toRow);
         }
-    }
+    }*/
 }

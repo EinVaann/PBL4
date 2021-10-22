@@ -1,3 +1,4 @@
+import backup.ChessController;
 import model.Board;
 import model.Calculate;
 import model.GenerateMove;
@@ -10,14 +11,15 @@ import java.util.Scanner;
 public class main {
     public static void main(String[] args) throws IOException {
         Board board = new Board();
-        String fenCode = "rnbqkbnr/p7/1P6/8/8/8/8/RNBQKBNR b KQkq - 0 1";
+        String fenCode = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1";
         Calculate c = new Calculate();
         board.CreateBoard(fenCode);
         board.ShowBoard();
+        ChessController chessController = new ChessController(board);
+        /*
         System.out.println(board.getFenCode());
         Scanner input = new Scanner(System.in);
-       /* System.out.print("Start Square: ");
-        int startSquare = input.nextInt();*/
+
         while(true){
             System.out.print("\nStart Square: ");
             int start = input.nextInt();
@@ -34,7 +36,8 @@ public class main {
                 board.ShowBoard();
 
             }else System.out.println("invalid move");
-        }
+        }*/
+
         /*if (startSquare >= 0 && startSquare < 64) {
             List<Move> possibleMove = board.generateMove.GetPossibleMove(startSquare);
             for (Move move : possibleMove) {

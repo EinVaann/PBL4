@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.*;
 import javax.swing.JPanel;
 
 import static java.lang.System.*;
@@ -33,7 +34,7 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
 
     Color brown = new Color(212, 101, 4);
     Color littleWhite = new Color(245, 220, 198);
-    Color highlight = new Color(252, 153, 111, 127);
+    Color highlight = new Color(255, 71, 71, 127);
 
     private double scaleFactor = 0.9;
     private int originX = -1;
@@ -76,22 +77,13 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
             for(Move move: possibleMove){
                 int targetRow = move.TargetSquare/8;
                 int targetCol = move.TargetSquare%8;
-                out.println(targetRow+"-"+targetCol);
+                //out.println(targetRow+"-"+targetCol);
                 drawPossibleMove(g2,targetCol,targetRow);
             }
         }
     }
 
     private void drawPieces(Graphics2D g2) {
-        /*for(int row = 0; row < 8; row++) {
-            for(int col = 0; col < 8; col++) {
-                ChessPiece piece = chessDelegate.pieceAt(col, row);
-                if(piece != null) {
-                    drawImage(g2, col, row, piece.getImgName());
-                }
-            }
-        }*/
-        //Image image = ImageIO.read(new File("resource\\Bishop-white.png"));
         for(int index = 0;index<64;index++){
             if(board.Square[index]!=0) {
                 int row = index / 8;
@@ -170,17 +162,20 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
         int row = (e.getPoint().y - originY) / cellSize;
         int start = fromRow*8+fromCol;
         int target = row*8+col;
-        out.println(start+"->"+target);
-        out.println(board.generateMove.validMove(start,target));
         if (fromCol != col || fromRow != row) {
+            out.println(start+"->"+target);
+            out.println(board.generateMove.validMove(start,target));
             //chessDelegate.movePiece(fromCol, fromRow, col, row);
             if(board.generateMove.validMove(start,target)) {
                 board.MovePiece(fromRow * 8 + fromCol, row * 8 + col);
                 turn = board.TurnColor==16?"Black":"White";
+                playSound();
             }
         }
+
         possibleMove = new ArrayList<Move>();
         repaint();
+
     }
 
     @Override
@@ -188,4 +183,16 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void mouseExited(MouseEvent e) {}
+
+    public void playSound(){
+        try {
+            File moveSound = new File("resource\\move.wav");
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(moveSound);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            clip.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

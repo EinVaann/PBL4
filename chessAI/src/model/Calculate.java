@@ -35,7 +35,6 @@ public class Calculate {
                 if(targetSquare<0 || targetSquare>63) continue;
                 int delta_x = targetSquare%8 - x;
                 int delta_y = targetSquare/8 - y;
-                //System.out.println(delta_x+"-"+ delta_y);
                 if(Math.max(Math.abs(delta_x),Math.abs(delta_y))==2){
                     legalKnightJumps.add(targetSquare);
                     //System.out.println(squareIndex+"->"+ targetSquare);

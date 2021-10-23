@@ -13,7 +13,6 @@ import static java.lang.System.out;
 public final class ImageData {
     public static ImageData Instance;
     public Map<Integer, Image> keyNameValueImage = new HashMap<Integer, Image>();
-
     private ImageData(){
         int[] imageNames = {
                 Piece.Black+Piece.Bishop,

@@ -15,6 +15,7 @@ public class main {
         Calculate c = new Calculate();
         board.CreateBoard(fenCode);
         board.ShowBoard();
+        System.out.println();
         ChessController chessController = new ChessController(board);
         /*
         System.out.println(board.getFenCode());

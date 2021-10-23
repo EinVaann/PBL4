@@ -27,6 +27,7 @@ public class Board {
     public GenerateMove generateMove;
     public int TurnColor;
     public int[] Square;
+    public int EnPassant;
     public Board(){
         Square = new int[64];
         generateMove = null;
@@ -58,6 +59,11 @@ public class Board {
         String turn = fen.split(" ")[1];
         TurnColor = (turn.equals("w"))?8:16;
         generateMove = new GenerateMove(Square,TurnColor);
+
+        String enPassant = fen.split(" ")[4];
+        if(!enPassant.equals("-")){
+            
+        }
     }
 
     public void ShowBoard(){

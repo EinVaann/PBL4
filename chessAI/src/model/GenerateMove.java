@@ -46,17 +46,19 @@ public class GenerateMove {
         //pawn move
         int targetSquare = startSquare + pawnOffset;
         int pieceOnTargetSquare = board[targetSquare];
-        if(pieceOnTargetSquare==0){//There are a piece on target square
+        if(pieceOnTargetSquare==0){//There aren't any piece piece on target square
             moves.add(new Move(startSquare,targetSquare));
-        }
-        //pawn double move at the start
-        int pawnStartRank = CurrentColor == Piece.Black?1:6;
-        if(startSquare/8==pawnStartRank){
-            //check if square is free
-            int doubleMoveSquare = startSquare + 2*pawnOffset;
-            int pieceOnSquare = board[doubleMoveSquare];
-            if(pieceOnTargetSquare==0){//There aren't any pieces on target square
-                moves.add(new Move(startSquare,doubleMoveSquare));
+
+            //pawn double move at the start
+            //only check double move if single move is possible
+            int pawnStartRank = CurrentColor == Piece.Black?1:6;
+            if(startSquare/8==pawnStartRank){
+                //check if square is free
+                int doubleMoveSquare = startSquare + 2*pawnOffset;
+                int pieceOnSquare = board[doubleMoveSquare];
+                if(pieceOnSquare==0){//There aren't any pieces on target square
+                    moves.add(new Move(startSquare,doubleMoveSquare));
+                }
             }
         }
         //pawn capture
@@ -102,79 +104,28 @@ public class GenerateMove {
     }
 
     private void GenerateKnightMove(int startSquare, int piece) {
-        //System.out.print("knight");
+        //System.out.println("Knight--");
         int CurrentColor = Piece.getColor(piece);
         int OpponentColor = CurrentColor==8?16:8;
+
        // System.out.println(Calculate.KnightMove[startSquare].length);
         for(int moveIndex=0; moveIndex < Calculate.KnightMove[startSquare].length;moveIndex++){
+
             int targetSquare =  Calculate.KnightMove[startSquare][moveIndex];
-           // System.out.println(targetSquare);
             int pieceOnTargetSquare = board[targetSquare];
 
             //check if block by allie pieces
             if(Piece.isColor(pieceOnTargetSquare,CurrentColor)){
-                break; // not look in this direction anymore
+                continue; // not look in this direction anymore
             }
 
             moves.add(new Move(startSquare,targetSquare));
+
             //System.out.println(startSquare+"->"+targetSquare);
             //check if block by opponent pieces
-            if(Piece.isColor(pieceOnTargetSquare,OpponentColor)){
+            /*if(Piece.isColor(pieceOnTargetSquare,OpponentColor)){
                 break; // not look in this direction anymore
-            }
-        }
-    }
-
-    private void GenerateSingleMove(int startSquare, int piece) {
-        int CurrentColor = Piece.getColor(piece);
-        int OpponentColor = CurrentColor==8?16:8;
-        int[] possibleMove = new int[0];
-        if(Piece.isType(piece,Piece.King)){
-            possibleMove = new int[]{1,7,8,9,-1,-7,-8,-9};
-        }
-        if(Piece.isType(piece,Piece.Pawn)){
-            //if it black move let it goes down, and another way around
-            int move = Piece.isColor(piece,Piece.Black)?8:-8;
-            //check if pawn has move or not. if not it can move 2 squares
-            if((startSquare>=8 && startSquare <= 15)||(startSquare>=48 && startSquare <= 55)){
-                possibleMove = new int[]{move,move*2};
-            }else possibleMove  = new int[]{move};
-
-        }
-        for(int possible: possibleMove){
-            int targetSquare = startSquare + possible;
-            int pieceOnTargetSquare = board[targetSquare];
-            //check if block by allie pieces
-            if(Piece.isColor(pieceOnTargetSquare,CurrentColor)){
-                break; // not look in this direction anymore
-            }
-
-            //check if block by opponent pieces
-            if(!Piece.isType(piece,Piece.Pawn)) {
-                //if block and it's not pawn, add to move list as a capture move
-                moves.add(new Move(startSquare,targetSquare));
-                if (Piece.isColor(pieceOnTargetSquare, OpponentColor)) {
-                    break; // not look in this direction anymore
-                }
-            }
-            //Check pawn condition of capturing opponent pieces
-            else{
-                if (Piece.isColor(pieceOnTargetSquare, OpponentColor)) {
-                    break; // not look in this direction anymore
-                }
-                moves.add(new Move(startSquare,targetSquare));
-                int[] blackPawnCap = new int[]{7,9};
-                int[] whitePawnCap = new int[]{-7,-9};
-                int[] captureMove = (Piece.isColor(piece,Piece.Black))?blackPawnCap:whitePawnCap;
-                for(int capture: captureMove){
-                    int captureSquare = startSquare + capture;
-                    if(captureSquare<0 || capture>63) break;
-                    int pieceOnCaptureSquare = board[captureSquare];
-                    if (Piece.isColor(pieceOnCaptureSquare, OpponentColor)) {
-                        break; // not look in this direction anymore
-                    }
-                }
-            }
+            }*/
         }
     }
 
@@ -223,9 +174,9 @@ public class GenerateMove {
         return possibleMoves;
     }
 
-    public boolean validMove(int startSquare, int TargetSquare){
+    public boolean validMove(int startSquare, int targetSquare){
         for(Move m: moves){
-            if(m.StartSquare==startSquare && m.TargetSquare==TargetSquare){
+            if(m.StartSquare==startSquare && m.TargetSquare==targetSquare){
                 return true;
             }
         }

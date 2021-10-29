@@ -20,6 +20,8 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
+import ServerAndClient.MultiClients;
+
 import static java.lang.System.*;
 
 public class ChessView extends JPanel implements MouseListener, MouseMotionListener {
@@ -30,6 +32,8 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
 //	private Map<Integer, Image> keyNameValueImage = new HashMap<Integer, Image>();
 
     private Board board;
+    
+    private MultiClients ClientThread;
 
     Color brown = new Color(212, 101, 4);
     Color littleWhite = new Color(245, 220, 198);
@@ -49,8 +53,9 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
     private List<Move> possibleMove = new ArrayList<Move>();
     public ChessView() {}
 
-    public ChessView(Board board) {
+    public ChessView(Board board, MultiClients ClientThread) {
         this.board = board;
+        this.ClientThread = ClientThread;
         turn = board.TurnColor==16?"Black":"White";
         this.keyNameValueImage = ImageData.getInstance().keyNameValueImage;
 
@@ -71,6 +76,7 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
         Graphics2D g2 = (Graphics2D)g;
         drawBoard(g2);
         drawPieces(g2);
+        board.ShowBoard();
 
         if(possibleMove.size()!=0){
             for(Move move: possibleMove){
@@ -160,6 +166,7 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
         fromCol = (e.getPoint().x - originX) / cellSize;
         fromRow = (e.getPoint().y - originY) / cellSize;
         showPossibleMove(fromRow,fromCol);
+       
         repaint();
        // movingPiece = chessDelegate.pieceAt(fromCol, fromRow);
     }
@@ -177,6 +184,8 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
             if(board.generateMove.validMove(start,target)) {
                 board.MovePiece(fromRow * 8 + fromCol, row * 8 + col);
                 turn = board.TurnColor==16?"Black":"White";
+                String nuocdi = board.getFenCode();
+                this.ClientThread.ClientOutServerIn(nuocdi);
             }
         }
         possibleMove = new ArrayList<Move>();
@@ -188,4 +197,11 @@ public class ChessView extends JPanel implements MouseListener, MouseMotionListe
 
     @Override
     public void mouseExited(MouseEvent e) {}
+    
+	public void ReCreate(String s)
+	{
+		this.board.CreateBoard(s);
+		repaint();
+		//repaint();
+	}
 }

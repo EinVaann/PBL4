@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 import backup.ChessController;
+import backup.ChessView;
 import model.Board;
 import model.Calculate;
 import model.GenerateMove;
@@ -65,6 +66,7 @@ public class MultiClients extends Thread {
 	{
 		cd.SetName(Name);
 		cd.SetChannel(channel);
+		
 	}
 	public void run()
 	{
@@ -93,15 +95,7 @@ public class MultiClients extends Thread {
 						System.out.print("changing channel in body: "+reply+"\n");
 						GUI.ClearDisplay();
 						setChangedChannel();
-					
-//				        board = new Board();
-//				        String fenCode = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1";
-//				        Calculate ca = new Calculate();
-//				        board.CreateBoard(fenCode);
-//				        board.ShowBoard();
-//				        chessController = new ChessController(board);
-//				        GUI.StopChangeChannel();
-				        
+						        
 
 					}
 
@@ -170,6 +164,10 @@ public class MultiClients extends Thread {
 			String []Y=Rep.split("=");
 			GUI.setDisplay(Y[1]);
 			//System.out.println(Y[1]+"\n \n \n \n");
+			String []code = Y[1].split(": ");
+			GUI.repa(code[1]);
+			
+			System.out.println(Y[1]+"\n \n \n \n");
 		}
 		
 	}
@@ -184,7 +182,7 @@ public class MultiClients extends Thread {
 	{
 		GUI.setUserInChannel(cd.GetName()+": "+cd.GetChannel());
 	}
-	public class ClientData
+public class ClientData
 	{
 		public String ClientName;
 		public String channel;

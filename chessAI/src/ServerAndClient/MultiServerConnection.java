@@ -27,6 +27,9 @@ public class MultiServerConnection extends Thread {
 		try {
 			long ThreadID=this.getId();
 			dout.writeUTF(OutText);
+		// tin nhan serrver
+			
+		//	System.out.println(OutText);
 			dout.flush();
 		} catch (IOException e) {
 			e.printStackTrace();

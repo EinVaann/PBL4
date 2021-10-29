@@ -30,7 +30,7 @@ public class Client{
 	public Client()
 	{
 		Board board = new Board();
-		String fenCode = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1";
+		String fenCode = "RNBQKBNR/PPPPPPPP/8/8/8/8/pppppppp/rnbqkbnr b KQkq - 0 1";
 		Calculate c = new Calculate();
 		board.CreateBoard(fenCode);
 		board.ShowBoard();

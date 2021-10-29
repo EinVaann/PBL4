@@ -34,6 +34,7 @@ public class Board {
 
     public void CreateBoard(String fen){
        //create Board from a fenCode
+    	Square=new int[64];
         String board = fen.split(" ")[0];
         int file=0,rank=0;
 
@@ -45,7 +46,7 @@ public class Board {
                 if(Character.isDigit(symbol)){
                     file+= Character.getNumericValue(symbol);
                 }else{
-                    int pieceColor = (Character.isUpperCase(symbol))? Piece.White:Piece.Black;
+                    int pieceColor = (Character.isUpperCase(symbol))? Piece.Black:Piece.White;
                     int pieceType = pieceTypeSymbol.get(Character.toLowerCase(symbol));
                     //.out.println(rank*8+file+"-"+symbol+"-"+pieceColor);
                     Square[rank*8+file] = pieceColor | pieceType;

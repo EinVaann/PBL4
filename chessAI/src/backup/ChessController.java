@@ -46,6 +46,17 @@ public class ChessController extends JFrame implements ActionListener {
 
     public ChessController(Board board) {
         //chessModel.reset();
+		try {
+			Socket s = new Socket("localhost",3333);
+			ClientThread = new MultiClients(s,this);
+			ClientThread.start();
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         this.board = board;
         JFrame frame = new JFrame("Chess");
         frame.setSize(1200, 600);
@@ -54,8 +65,10 @@ public class ChessController extends JFrame implements ActionListener {
 
         
         frame.setResizable(false);
-        panel = new ChessView(board);
+        
+        panel = new ChessView(board,ClientThread);
 
+        
         frame.add(panel);
         c = new JPanel();
 		display = new JTextArea(30, 40);
@@ -100,17 +113,8 @@ public class ChessController extends JFrame implements ActionListener {
 		item1.addActionListener(handler);
 		username.addActionListener(handler); 
 		item3.addActionListener(handler);
-		try {
-			Socket s = new Socket("localhost",3333);
-			ClientThread = new MultiClients(s,this);
-			ClientThread.start();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
+
 		
 		
 		frame.add(c);
@@ -208,5 +212,9 @@ public class ChessController extends JFrame implements ActionListener {
 	}
 	public void StopChangeChannel() {
 		item3.setEditable(false);
+	}
+	public void repa(String s)
+	{
+		panel.ReCreate(s);
 	}
 }

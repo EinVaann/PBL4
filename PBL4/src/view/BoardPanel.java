@@ -107,7 +107,7 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
             for(Move move: possibleMove){
                 int targetRow = move.TargetSquare/8;
                 int targetCol = move.TargetSquare%8;
-                out.println(targetRow+"-"+targetCol);
+                //out.println(targetRow+"-"+targetCol);
                 drawSquare(g2,targetRow,targetCol,highlight);
             }
         }
@@ -159,7 +159,9 @@ public class BoardPanel extends JPanel implements MouseListener, MouseMotionList
         int target = row*8+col;
         if (fromCol != col || fromRow != row) {
             if(board.generateMove.validMove(start,target)) {
-                board.MovePiece(fromRow * 8 + fromCol, row * 8 + col);
+                //board.MovePiece(fromRow * 8 + fromCol, row * 8 + col);
+                Move move = board.getMove(fromRow * 8 + fromCol, row * 8 + col);
+                board.executeMove(move);
                 turn = board.TurnColor==16?"Black":"White";
                 playSound();
             }

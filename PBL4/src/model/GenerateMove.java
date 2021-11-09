@@ -8,10 +8,14 @@ public class GenerateMove {
     //Get number of possible moves from every Square
     private int[] board = new int[64];
     private int turnColor;
-    public GenerateMove(int[] board, int turnColor){
+    private int EnPassant;
+    private boolean[] CastleRight;
+    public GenerateMove(int[] board, int turnColor, boolean[] CastleRight,int EnPassant){
         //System.out.println("creating");
         this.board = board;
         this.turnColor = turnColor;
+        this.CastleRight=CastleRight;
+        this.EnPassant=EnPassant;
         moves = GenerateMove();
     }
 
@@ -57,7 +61,7 @@ public class GenerateMove {
                 int doubleMoveSquare = startSquare + 2*pawnOffset;
                 int pieceOnSquare = board[doubleMoveSquare];
                 if(pieceOnSquare==0){//There aren't any pieces on target square
-                    moves.add(new Move(startSquare,doubleMoveSquare));
+                    moves.add(new Move(startSquare,doubleMoveSquare,3));
                 }
             }
         }
@@ -72,10 +76,14 @@ public class GenerateMove {
             int dx = Math.abs(captureSquare%8 - startSquare%8);
             int dy = Math.abs(captureSquare/8 - startSquare/8);
             if(dx!=1 || dy!=1) continue;
-            //check if there is an opponent pieces on capture square
+            //check if there is an opponent pieces on capture square, or it is en passant
             int pieceOnCaptureSquare = board[captureSquare];
             if ( Piece.isColor(pieceOnCaptureSquare,OpponentColor)){
                 moves.add(new Move(startSquare,captureSquare));
+            }
+            //System.out.println(EnPassant);
+            if(captureSquare==EnPassant){
+                moves.add(new Move(startSquare,captureSquare,4));
             }
         }
     }
@@ -83,6 +91,9 @@ public class GenerateMove {
     private void GenerateKingMove(int startSquare, int piece) {
         int CurrentColor = Piece.getColor(piece);
         int OpponentColor = CurrentColor==8?16:8;
+        boolean hasKingCastleRight = CastleRight[CurrentColor/4-2];
+        boolean hasQueenCastleRight = CastleRight[CurrentColor/4-1];
+        //System.out.println(hasKingCastleRight+"-"+hasQueenCastleRight);
         for(int moveIndex=0; moveIndex < Calculate.KingMove[startSquare].length;moveIndex++) {
             //System.out.println(startSquare+"->"+Calculate.KnightMove[startSquare][moveIndex]);
             int targetSquare =  Calculate.KingMove[startSquare][moveIndex];
@@ -99,6 +110,24 @@ public class GenerateMove {
             //check if block by opponent pieces
             if(Piece.isColor(pieceOnTargetSquare,OpponentColor)){
                 continue; // not look in this direction anymore
+            }
+
+            //castling
+            if((targetSquare == 5 || targetSquare == 61) && hasKingCastleRight){
+                int castleKingsideSquare = targetSquare + 1;
+                //System.out.println("check king");
+                if (board[castleKingsideSquare] == Piece.None) {
+                    System.out.println(startSquare+"-"+castleKingsideSquare);
+                    moves.add(new Move(startSquare,castleKingsideSquare,1));
+                }
+            }
+            if((targetSquare == 3 || targetSquare == 59) && hasQueenCastleRight){
+                int castleQueenSquare = targetSquare - 1;
+                //System.out.println("check queen");
+                if (board[castleQueenSquare] == Piece.None) {
+                    System.out.println(startSquare+"-"+castleQueenSquare);
+                    moves.add(new Move(startSquare,castleQueenSquare,2));
+                }
             }
         }
     }
@@ -120,12 +149,6 @@ public class GenerateMove {
             }
 
             moves.add(new Move(startSquare,targetSquare));
-
-            //System.out.println(startSquare+"->"+targetSquare);
-            //check if block by opponent pieces
-            /*if(Piece.isColor(pieceOnTargetSquare,OpponentColor)){
-                break; // not look in this direction anymore
-            }*/
         }
     }
 
@@ -140,8 +163,10 @@ public class GenerateMove {
         int endIndex = Piece.isType(piece,Piece.Rook)?4:8;
         //Check 8 direction
         for(int directionIndex = startIndex;directionIndex<endIndex;directionIndex++){
+
             //count number of square to edge from that direction
             for(int n = 0; n< Calculate.NumberSquareToEdge[startSquare][directionIndex]; n++){
+
                 //get a targetSquare n square away from startSquare in directionIndex direction
                 int targetSquare = startSquare+ Calculate.DirectionOffset[directionIndex]*(n+1);
                 int pieceOnTargetSquare = board[targetSquare];
@@ -163,7 +188,6 @@ public class GenerateMove {
             }
         }
     }
-
     public List<Move> GetPossibleMove(int startSquare){
         List<Move> possibleMoves = new ArrayList<Move>();
         for(Move move:moves){

@@ -27,14 +27,17 @@ public class Board {
     public GenerateMove generateMove;
     public int TurnColor;
     public int[] Square;
-    public int EnPassant;
+    public int EnPassant=-1;
+    public boolean[] CastleRight;
     public Board(){
         Square = new int[64];
         generateMove = null;
+        CastleRight = new boolean[4];
     }
 
     public void CreateBoard(String fen){
        //create Board from a fenCode
+        Square = new int[64];
         String board = fen.split(" ")[0];
         int file=0,rank=0;
 
@@ -58,11 +61,18 @@ public class Board {
         //set turn from fenCode
         String turn = fen.split(" ")[1];
         TurnColor = (turn.equals("w"))?8:16;
-        generateMove = new GenerateMove(Square,TurnColor);
+        generateMove = new GenerateMove(Square,TurnColor,CastleRight,EnPassant);
 
         String enPassant = fen.split(" ")[4];
         if(!enPassant.equals("-")){
             
+        }
+        String castleRight = fen.split(" ")[2];
+        System.out.println(castleRight.length());
+        for(int i=0;i<castleRight.length();i++){
+            if(castleRight.charAt(i)!='-')
+                CastleRight[i]=true;
+            else CastleRight[i]=false;
         }
     }
 
@@ -78,9 +88,60 @@ public class Board {
         Square[targetSquare] = Square[startSquare];
         Square[startSquare] = 0;
         TurnColor = TurnColor==16?8:16;
-        generateMove = new GenerateMove(Square,TurnColor);
+        //System.out.println(startSquare+"-"+targetSquare);
+        generateMove = new GenerateMove(Square,TurnColor,CastleRight,EnPassant);
     }
 
+    public void executeMove(Move move){
+        int startSquare = move.StartSquare;
+        int targetSquare = move.TargetSquare;
+        int flag = move.Flag;
+        Square[targetSquare] = Square[startSquare];
+        Square[startSquare] = 0;
+        if(flag!=0){
+            if(flag==1){
+                int rookCastling = targetSquare+1;
+                int rookSquareAfter = startSquare+1;
+                Square[rookSquareAfter] = Square[rookCastling];
+                Square[rookCastling] = 0;
+                CastleRight[TurnColor/4-2]=false;
+                CastleRight[TurnColor/4-1]=false;
+            }
+            if(flag==2){
+                int rookCastling = targetSquare-2;
+                int rookSquareAfter = startSquare-1;
+                Square[rookSquareAfter] = Square[rookCastling];
+                Square[rookCastling] = 0;
+                CastleRight[TurnColor/4-2]=false;
+                CastleRight[TurnColor/4-1]=false;
+            }
+            if(flag==3){
+                if(TurnColor==Piece.White){
+                    EnPassant=targetSquare+8;
+                }else EnPassant=targetSquare-8;
+                System.out.println(EnPassant);
+            }
+            if(flag==4){
+                if(TurnColor==Piece.White){
+                    Square[targetSquare+8]=Piece.None;
+                }else Square[targetSquare-8]=Piece.None;
+            }
+
+        }
+        TurnColor = TurnColor==16?8:16;
+        generateMove = new GenerateMove(Square,TurnColor,CastleRight,EnPassant);
+        EnPassant = -1;
+        //System.out.println(startSquare+"-"+targetSquare);
+
+    }
+
+    public Move getMove(int startSquare, int targetSquare){
+        for(Move move: generateMove.moves){
+            if(move.StartSquare==startSquare && move.TargetSquare==targetSquare)
+                return move;
+        }
+        return null;
+    }
     public String getFenCode(){
         String fenCode = "";
         int emptyCount = 0;

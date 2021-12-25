@@ -1,2 +1,3 @@
 # PBL4
-UPDATE ON DECEMBER 24TH, ALMOST DONE
+RunServer with Server.java
+RunClient with Menu_GUI.java

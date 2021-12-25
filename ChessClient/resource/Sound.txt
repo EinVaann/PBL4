@@ -1,2 +1,0 @@
-Sound play : true 
-Show moves : true
